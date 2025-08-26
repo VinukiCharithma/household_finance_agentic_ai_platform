@@ -26,3 +26,36 @@ class ChartAgent:
         plt.savefig(path, bbox_inches="tight")
         plt.close()
         return path
+
+    def income_vs_expense_trend(self):
+        df = self._df()
+        if df.empty:
+            return None
+        df["date"] = pd.to_datetime(df["date"])
+        daily = df.groupby(["date","type"])["amount"].sum().unstack(fill_value=0)
+        daily = daily.sort_index()
+        plt.figure()
+        daily.plot()
+        plt.title("Daily Income vs Expense")
+        plt.xlabel("Date")
+        plt.ylabel("Amount")
+        path = os.path.join(self.output_dir, "income_vs_expense_trend.png")
+        plt.savefig(path, bbox_inches="tight")
+        plt.close()
+        return path
+
+    def top_spend_categories_bar(self, top_n=5):
+        df = self._df()
+        exp = df[df["type"].str.lower() == "expense"]
+        if exp.empty:
+            return None
+        by_cat = exp.groupby("category")["amount"].sum().abs().sort_values(ascending=False).head(top_n)
+        plt.figure()
+        by_cat.plot(kind="bar")
+        plt.title(f"Top {top_n} Spend Categories")
+        plt.xlabel("Category")
+        plt.ylabel("Total Spend")
+        path = os.path.join(self.output_dir, "top_spend_categories_bar.png")
+        plt.savefig(path, bbox_inches="tight")
+        plt.close()
+        return path
