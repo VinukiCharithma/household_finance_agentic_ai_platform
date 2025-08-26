@@ -11,3 +11,18 @@ class ChartAgent:
 
     def _df(self):
         return pd.read_sql_query("SELECT * FROM records", self.conn, parse_dates=["date"])
+
+    def expenses_by_category(self):
+        df = self._df()
+        df = df[df["type"].str.lower() == "expense"].copy()
+        if df.empty:
+            return None
+        by_cat = df.groupby("category")["amount"].sum().abs().sort_values(ascending=False)
+        plt.figure()
+        by_cat.plot(kind="pie", autopct="%1.1f%%")
+        plt.title("Expenses by Category")
+        plt.ylabel("")
+        path = os.path.join(self.output_dir, "expenses_by_category.png")
+        plt.savefig(path, bbox_inches="tight")
+        plt.close()
+        return path
