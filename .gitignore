@@ -5,3 +5,11 @@ __pycache__/
 .env/
 venv/
 output/
+household_finance.db
+
+
+# Data
+data/*.csv
+
+# Streamlit
+.streamlit/
